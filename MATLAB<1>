@@ -1,3 +1,4 @@
+/*Adam Otorowski, Jakub Pala, Szymon Pialik 2019*/
 D=serial('COM3');
 D.BaudRate=115200;
 fopen(D);
