@@ -1,0 +1,142 @@
+// Steppers
+//
+#define X_STEP_PIN         54
+#define X_DIR_PIN          55
+#define X_ENABLE_PIN       38
+#ifndef X_CS_PIN
+#define X_CS_PIN         53
+#endif
+
+#define Y_STEP_PIN         60
+#define Y_DIR_PIN          61
+#define Y_ENABLE_PIN       56
+#ifndef Y_CS_PIN
+#define Y_CS_PIN         49
+#endif
+
+#define Z_STEP_PIN         46
+#define Z_DIR_PIN          48
+#define Z_ENABLE_PIN       62
+#ifndef Z_CS_PIN
+#define Z_CS_PIN         40
+#endif
+// Limit Switches
+//
+#define X_MIN_PIN           3
+#ifndef X_MAX_PIN
+#define X_MAX_PIN         2
+#endif
+#define Y_MIN_PIN          14
+#define Y_MAX_PIN          15
+#define Z_MIN_PIN          18
+#define Z_MAX_PIN          19
+int s1 = 0, s2 = 0, s3 = 0;
+String msg;
+int i = 0;
+int kierunek1 = 0, kierunek2 = 0, kierunek3 = 0;
+bool flaga=false;
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+  pinMode(X_ENABLE_PIN, OUTPUT); ///ustawienie trybu na wyjście
+  digitalWrite(X_ENABLE_PIN, LOW);///odpalamy silnik(bo to wyjscie jest zanegowane wiec dalemy wartość LOW)
+  pinMode(Y_ENABLE_PIN, OUTPUT); ///ustawienie trybu na wyjście
+  digitalWrite(Y_ENABLE_PIN, LOW);
+  pinMode(Z_ENABLE_PIN, OUTPUT);
+  digitalWrite(Z_ENABLE_PIN, LOW);
+  pinMode(X_DIR_PIN, OUTPUT); //ustawienie trybu na wyjście
+  digitalWrite(X_DIR_PIN, HIGH);///kierunek silnika
+  pinMode(Y_DIR_PIN, OUTPUT);
+  digitalWrite(Y_DIR_PIN, HIGH);
+  pinMode(Z_DIR_PIN, OUTPUT);
+  digitalWrite(Z_DIR_PIN, HIGH);
+  pinMode(X_MAX_PIN, INPUT_PULLUP); ///krancowka X
+  pinMode(Y_MAX_PIN, INPUT_PULLUP); ///krancowka Y
+  pinMode(Z_MAX_PIN, INPUT_PULLUP); ///krancowka Z
+   pinMode(X_STEP_PIN, OUTPUT); ///sil X
+  pinMode(Y_STEP_PIN, OUTPUT); ///sil Y
+  pinMode(Z_STEP_PIN, OUTPUT); ///SIL Z
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+  //  Serial.print("a\n");
+  //  Serial.println("a");
+  if ((kierunek1 == 1 || (digitalRead(X_MAX_PIN) == 0 && kierunek1 == 0 )) &&  s1 > 0) //jeśli krancowka nie daje sygnalu
+  {
+    digitalWrite(X_STEP_PIN, HIGH);//jedz
+    s1--;
+  }
+  if ((kierunek2 == 1 || (digitalRead(Y_MAX_PIN) == 0 && kierunek2 == 0 )) &&  s2 > 0)
+  {
+    digitalWrite(Y_STEP_PIN, HIGH);
+    s2--;
+  }
+  if ((kierunek3 == 1 || (digitalRead(Z_MAX_PIN) == 0 && kierunek3 == 0 )) &&  s3 > 0)
+  {
+    digitalWrite(Z_STEP_PIN, HIGH);
+    s3--;
+  }
+  delay(1);
+  digitalWrite(Y_STEP_PIN, LOW);
+  digitalWrite(X_STEP_PIN, LOW);
+  digitalWrite(Z_STEP_PIN, LOW);
+  delay(1);
+  ///nie działa to na dole dla sinusa
+//  if(s1 != 0 || s2 != 0  || s3 != 0)
+//  {
+//  flaga=true;
+//  }
+//wysylanie komendy że drukarka skonczyla
+  if(s1 == 0 && s2 == 0 && s3 == 0 && flaga)
+  {
+   Serial.println("end");
+   flaga=false;
+  }
+  
+  //    digitalWrite(X_STEP_PIN, HIGH);
+  //    digitalWrite(Y_STEP_PIN, HIGH);
+  //    digitalWrite(Z_STEP_PIN, HIGH);
+  //   delay(5);
+  //   digitalWrite(X_STEP_PIN, LOW);
+  //   digitalWrite(Y_STEP_PIN, LOW);
+  //    digitalWrite(Z_STEP_PIN, LOW);
+  //  delay(5);
+  //Serial.println(digitalRead(X_MAX_PIN));
+  //  Serial.println(digitalRead(Y_MAX_PIN));
+  //  Serial.println(digitalRead(Z_MAX_PIN));
+  //    i++;
+  //    if (i<=100)
+  //    { digitalWrite(X_DIR_PIN, LOW);
+  //      digitalWrite(Y_DIR_PIN, LOW);
+  //      digitalWrite(Z_DIR_PIN, LOW);
+  //    }
+  //    if (i > 100 )
+  //    { digitalWrite(X_DIR_PIN, HIGH);
+  //      digitalWrite(Y_DIR_PIN, HIGH);
+  //      digitalWrite(Z_DIR_PIN, HIGH);
+  //    }
+  //    if (i==200)
+  //  i=0;
+
+  while (Serial.available() > 0)
+  {
+    msg = Serial.readStringUntil('\n');
+    sscanf(msg.c_str(), "a %d b %d c %d", &s1, &s2, &s3);
+     flaga=true; ///danie tego tutaj zadziala z sinusem
+    kierunek1 = s1 < 0;
+    digitalWrite(X_DIR_PIN, kierunek1);
+    s1 = abs(s1);
+
+    kierunek2 = s2 < 0;
+    digitalWrite(Y_DIR_PIN, kierunek2);
+    s2 = abs(s2);
+
+    kierunek3 = s3 < 0;
+    digitalWrite(Z_DIR_PIN, kierunek3);
+    s3 = abs(s3);
+//    Serial.println(s1);
+//    Serial.println(s2);
+//    Serial.println(s3);
+  }
+}
