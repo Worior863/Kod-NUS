@@ -1,3 +1,4 @@
+/*Adam Otorowski, Jakub Pala, Szymon Pialik 2019*/
 stare=0;
 for t=0.1:0.1:10  
 a=round(100*sin(t));
