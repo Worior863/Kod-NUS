@@ -1,0 +1,3 @@
+D=serial('COM3');
+D.BaudRate=115200;
+fopen(D);
