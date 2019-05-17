@@ -1,0 +1,16 @@
+stare=0;
+for t=0.1:0.1:10  
+a=round(100*sin(t));
+b=round(100*sin(t+((2/3)*pi)));
+c=round(100*sin(t+((4/3)*pi)));
+% b=a-stare;
+fprintf(D,'a %d b %d c %d \n',[a b c]);
+while (D.BytesAvailable==0)
+end
+S =fscanf(D);
+% fprintf(D,'a -100 b -100 c -100');
+% while (D.BytesAvailable==0)
+% end
+% S =fscanf(D);
+% stare=a;
+end
